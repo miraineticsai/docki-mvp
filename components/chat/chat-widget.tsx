@@ -349,7 +349,7 @@ export function ChatWidget() {
 
       {/* Large Centered Modal Dialog & Backdrop */}
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-5 md:p-6 animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-5 md:p-6 animate-in fade-in duration-200">
           {/* Backdrop button */}
           <button
             type="button"
@@ -363,41 +363,41 @@ export function ChatWidget() {
             role="dialog"
             aria-modal="true"
             aria-label="Aura Clinic Assistant & Appointment Booking"
-            className="relative w-full max-w-3xl lg:max-w-4xl h-[680px] max-h-[92vh] flex flex-col rounded-2xl sm:rounded-3xl border border-slate-200/90 bg-white shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200"
+            className="relative w-full max-w-3xl lg:max-w-4xl h-[100dvh] sm:h-[680px] max-h-[100dvh] sm:max-h-[92vh] flex flex-col rounded-none sm:rounded-3xl border-0 sm:border sm:border-slate-200/90 bg-white shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200"
           >
             {/* Modal Header */}
-            <div className="bg-gradient-to-r from-teal-800 via-teal-900 to-slate-900 px-5 py-4 text-white flex items-center justify-between border-b border-teal-700/50 shadow-sm">
-              <div className="flex items-center gap-3.5">
-                <div className="relative flex size-11 items-center justify-center rounded-2xl bg-teal-600/80 ring-2 ring-teal-300/30 shadow-inner">
+            <div className="bg-gradient-to-r from-teal-800 via-teal-900 to-slate-900 px-3.5 py-3 sm:px-5 sm:py-4 text-white flex items-center justify-between border-b border-teal-700/50 shadow-sm shrink-0">
+              <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
+                <div className="relative flex size-9 sm:size-11 items-center justify-center rounded-xl sm:rounded-2xl bg-teal-600/80 ring-2 ring-teal-300/30 shadow-inner shrink-0">
                   <HugeiconsIcon
                     icon={SparklesIcon}
-                    className="size-5.5 text-teal-100"
+                    className="size-4.5 sm:size-5.5 text-teal-100"
                     strokeWidth={2.2}
                   />
-                  <span className="absolute bottom-0 right-0 size-3 rounded-full bg-emerald-400 border-2 border-teal-950" />
+                  <span className="absolute bottom-0 right-0 size-2.5 sm:size-3 rounded-full bg-emerald-400 border-2 border-teal-950" />
                 </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-base font-semibold leading-tight text-white">
-                      Aura Clinic Assistant & Booking
+                <div className="min-w-0">
+                  <div className="flex items-center gap-1.5 sm:gap-2">
+                    <h3 className="text-sm sm:text-base font-semibold leading-tight text-white truncate">
+                      Aura Clinic Assistant
                     </h3>
-                    <span className="hidden sm:inline-flex items-center gap-1 rounded-full bg-teal-500/20 px-2 py-0.5 text-[10px] font-medium text-teal-200 border border-teal-400/30">
+                    <span className="hidden sm:inline-flex items-center gap-1 rounded-full bg-teal-500/20 px-2 py-0.5 text-[10px] font-medium text-teal-200 border border-teal-400/30 shrink-0">
                       <span className="size-1.5 rounded-full bg-emerald-400" />
                       Live AI Concierge
                     </span>
                   </div>
-                  <p className="text-xs text-teal-200/90 leading-tight mt-0.5">
-                    Dr. Rajesh Kulkarni, MBBS • Consultant Physician • Pune
+                  <p className="text-[11px] sm:text-xs text-teal-200/90 leading-tight mt-0.5 truncate">
+                    Dr. Rajesh Kulkarni, MBBS • Pune
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-center gap-1.5">
+              <div className="flex items-center gap-1 shrink-0">
                 {/* New Conversation Button */}
                 <button
                   type="button"
                   onClick={handleResetConversation}
-                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-teal-200 hover:text-white hover:bg-white/10 transition-colors text-xs font-medium"
+                  className="flex items-center gap-1 px-2 py-1.5 sm:px-2.5 rounded-xl text-teal-200 hover:text-white hover:bg-white/10 active:bg-white/20 transition-colors text-xs font-medium"
                   title="Start fresh conversation"
                   aria-label="Start fresh conversation"
                 >
@@ -413,7 +413,7 @@ export function ChatWidget() {
                 <button
                   type="button"
                   onClick={() => setIsOpen(false)}
-                  className="p-2 rounded-xl text-teal-200 hover:text-white hover:bg-white/10 transition-colors"
+                  className="p-1.5 sm:p-2 rounded-xl text-teal-200 hover:text-white hover:bg-white/10 active:bg-white/20 transition-colors"
                   title="Close chat dialog"
                   aria-label="Close chat dialog"
                 >
@@ -427,20 +427,25 @@ export function ChatWidget() {
             </div>
 
             {/* Medical Notice / Guardrail Banner */}
-            <div className="flex items-center justify-between gap-2 bg-amber-50/90 border-b border-amber-200/70 px-4 py-2 text-xs text-amber-900">
-              <div className="flex items-center gap-2">
+            <div className="flex items-center justify-between gap-2 bg-amber-50/90 border-b border-amber-200/70 px-3.5 py-1.5 sm:px-4 sm:py-2 text-[11px] sm:text-xs text-amber-900 shrink-0">
+              <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
                 <HugeiconsIcon
                   icon={InformationCircleIcon}
-                  className="size-4 shrink-0 text-amber-700"
+                  className="size-3.5 sm:size-4 shrink-0 text-amber-700"
                   strokeWidth={2}
                 />
-                <span>
-                  Assistant provides clinic timings, appointment assistance &
-                  FAQs. In medical emergencies, please visit the hospital
-                  casualty ward directly.
+                <span className="truncate sm:whitespace-normal">
+                  <span className="sm:hidden">
+                    For clinic FAQs & bookings. In emergency, visit casualty.
+                  </span>
+                  <span className="hidden sm:inline">
+                    Assistant provides clinic timings, appointment assistance &
+                    FAQs. In medical emergencies, please visit the hospital
+                    casualty ward directly.
+                  </span>
                 </span>
               </div>
-              <div className="hidden lg:flex items-center gap-1 text-[11px] text-amber-800 font-medium">
+              <div className="hidden lg:flex items-center gap-1 text-[11px] text-amber-800 font-medium shrink-0">
                 <HugeiconsIcon
                   icon={Calendar03Icon}
                   className="size-3.5 text-amber-700"
@@ -450,7 +455,7 @@ export function ChatWidget() {
             </div>
 
             {/* Message Thread (Spacious) */}
-            <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 bg-slate-50/50 text-sm">
+            <div className="flex-1 overflow-y-auto overscroll-contain p-3.5 sm:p-6 space-y-3 sm:space-y-4 bg-slate-50/50 text-sm">
               {messages.map((msg) => (
                 <div
                   key={msg.id}
@@ -459,7 +464,7 @@ export function ChatWidget() {
                   }`}
                 >
                   <div
-                    className={`max-w-[90%] sm:max-w-[80%] rounded-2xl px-4 py-3 text-sm leading-relaxed whitespace-pre-wrap break-words shadow-xs ${
+                    className={`max-w-[88%] sm:max-w-[80%] rounded-2xl px-3.5 py-2.5 sm:px-4 sm:py-3 text-[13.5px] sm:text-sm leading-relaxed whitespace-pre-wrap break-words shadow-xs ${
                       msg.role === "user"
                         ? "bg-teal-700 text-white rounded-tr-xs"
                         : msg.isError
@@ -469,7 +474,7 @@ export function ChatWidget() {
                   >
                     {msg.text}
                   </div>
-                  <span className="text-[11px] text-slate-400 mt-1 px-1">
+                  <span className="text-[10px] sm:text-[11px] text-slate-400 mt-1 px-1">
                     {msg.timestamp}
                   </span>
                 </div>
@@ -477,20 +482,20 @@ export function ChatWidget() {
 
               {/* Quick Suggestions (Shown when only initial message exists) */}
               {messages.length === 1 && !isLoading && (
-                <div className="pt-3 space-y-2 max-w-xl">
-                  <p className="text-xs font-semibold text-slate-500 uppercase tracking-wider px-1">
-                    Common Questions & Actions
+                <div className="pt-2 sm:pt-3 space-y-1.5 sm:space-y-2 max-w-xl">
+                  <p className="text-[11px] sm:text-xs font-semibold text-slate-500 uppercase tracking-wider px-1">
+                    Quick Actions
                   </p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 sm:gap-2">
                     {SUGGESTED_QUESTIONS.map((question) => (
                       <button
                         key={question}
                         type="button"
                         onClick={() => handleSendMessage(question)}
-                        className="text-left text-xs bg-white hover:bg-teal-50/80 border border-slate-200 hover:border-teal-300 text-slate-700 hover:text-teal-900 rounded-xl px-3.5 py-2.5 transition-all shadow-xs flex items-center justify-between group"
+                        className="text-left text-xs bg-white hover:bg-teal-50/80 active:bg-teal-100 border border-slate-200 hover:border-teal-300 text-slate-700 hover:text-teal-900 rounded-xl px-3 py-2 sm:px-3.5 sm:py-2.5 transition-all shadow-xs flex items-center justify-between group touch-manipulation"
                       >
-                        <span>{question}</span>
-                        <span className="text-teal-500 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <span className="truncate pr-1">{question}</span>
+                        <span className="text-teal-500 opacity-60 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity shrink-0">
                           &rarr;
                         </span>
                       </button>
@@ -502,7 +507,7 @@ export function ChatWidget() {
               {/* Typing / Loading Indicator */}
               {isLoading && (
                 <div className="flex flex-col items-start space-y-1">
-                  <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-2xl rounded-tl-xs px-4 py-3 shadow-xs">
+                  <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-2xl rounded-tl-xs px-3.5 py-2.5 sm:px-4 sm:py-3 shadow-xs">
                     <span className="text-xs text-slate-500">
                       Dr. Kulkarni&apos;s assistant is thinking
                     </span>
@@ -517,13 +522,13 @@ export function ChatWidget() {
             </div>
 
             {/* Chat Input Footer */}
-            <div className="border-t border-slate-200 bg-white p-3 sm:p-4">
+            <div className="border-t border-slate-200 bg-white p-2.5 sm:p-4 pb-[max(0.625rem,env(safe-area-inset-bottom))] shrink-0">
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
                   handleSendMessage();
                 }}
-                className="flex items-end gap-2.5"
+                className="flex items-end gap-2 sm:gap-2.5"
               >
                 <textarea
                   ref={textareaRef}
@@ -532,16 +537,16 @@ export function ChatWidget() {
                   onChange={handleInputChange}
                   onKeyDown={handleKeyDown}
                   disabled={isLoading}
-                  placeholder="Ask about booking an appointment, timings, fees, or services..."
+                  placeholder="Ask about booking, timings, fees..."
                   maxLength={1000}
-                  className="flex-1 min-w-0 resize-none overflow-y-auto max-h-32 min-h-[42px] bg-slate-50 border border-slate-200 rounded-xl px-4 py-2.5 text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white disabled:opacity-60 transition leading-relaxed"
+                  className="flex-1 min-w-0 resize-none overflow-y-auto max-h-28 sm:max-h-32 min-h-[42px] bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-base sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white disabled:opacity-60 transition leading-relaxed"
                 />
 
                 <Button
                   type="submit"
                   disabled={!input.trim() || isLoading}
                   size="default"
-                  className="h-[42px] px-4 rounded-xl bg-teal-700 hover:bg-teal-800 text-white shrink-0 disabled:opacity-40 transition-colors shadow-xs flex items-center gap-1.5 self-end"
+                  className="h-[42px] w-[42px] sm:w-auto px-0 sm:px-4 rounded-xl bg-teal-700 hover:bg-teal-800 text-white shrink-0 disabled:opacity-40 transition-colors shadow-xs flex items-center justify-center gap-1.5 self-end"
                   aria-label="Send message"
                 >
                   <span className="hidden sm:inline text-xs font-semibold">
@@ -554,8 +559,11 @@ export function ChatWidget() {
                   />
                 </Button>
               </form>
-              <div className="mt-2 flex items-center justify-between px-1 text-[11px] text-slate-400">
-                <span>Press Enter to send • Shift+Enter for newline</span>
+              <div className="mt-1.5 flex items-center justify-between px-1 text-[10px] sm:text-[11px] text-slate-400">
+                <span className="hidden sm:inline">
+                  Press Enter to send • Shift+Enter for newline
+                </span>
+                <span className="sm:hidden">Aura Virtual Assistant</span>
                 <span>Aura Health Clinic • Pune</span>
               </div>
             </div>
