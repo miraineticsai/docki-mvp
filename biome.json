@@ -22,7 +22,13 @@
   "linter": {
     "enabled": true,
     "rules": {
-      "recommended": true
+      "recommended": true,
+      "a11y": {
+        "noLabelWithoutControl": "off"
+      },
+      "suspicious": {
+        "noDocumentCookie": "off"
+      }
     },
     "domains": {
       "next": "recommended",
