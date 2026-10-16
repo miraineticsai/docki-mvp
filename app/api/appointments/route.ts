@@ -6,19 +6,53 @@ import { appointmentSubmissionSchema } from "@/lib/validations/appointment";
 
 /**
  * POST /api/appointments
- * API endpoint ready for chatbot integration, n8n automations, and third-party webhooks.
+ * Simple, n8n-friendly endpoint for creating appointments via AI chat, WhatsApp, or webhooks.
+ *
+ * Accepts either simple shorthand:
+ *   { "name": "...", "phone": "...", "date": "YYYY-MM-DD", "slot": "10:00 AM", "reason": "Fever" }
+ * Or full website form format:
+ *   { "patientName": "...", "patientPhone": "...", "patientEmail": "...", "preferredDate": "...", "preferredTimeSlot": "..." }
  */
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
+    let body: Record<string, unknown> = {};
+    try {
+      body = await request.json();
+    } catch {
+      return NextResponse.json(
+        { success: false, message: "Invalid JSON in request body." },
+        { status: 400 },
+      );
+    }
 
-    const validation = appointmentSubmissionSchema.safeParse(body);
+    // Normalize shorthand fields (name -> patientName, phone -> patientPhone, etc.)
+    const normalizedData = {
+      patientName: String(body.name || body.patientName || "").trim(),
+      patientPhone: String(body.phone || body.patientPhone || "").trim(),
+      patientEmail: String(
+        body.email || body.patientEmail || "patient@auraclinic.com",
+      ).trim(),
+      visitType: String(
+        body.reason || body.visitType || "General Consultation",
+      ).trim(),
+      preferredDate: String(body.date || body.preferredDate || "").trim(),
+      preferredTimeSlot: String(
+        body.slot || body.time || body.preferredTimeSlot || "",
+      ).trim(),
+      notes:
+        body.notes || body.symptoms
+          ? String(body.notes || body.symptoms).trim()
+          : undefined,
+    };
+
+    const validation = appointmentSubmissionSchema.safeParse(normalizedData);
     if (!validation.success) {
       return NextResponse.json(
         {
           success: false,
-          error: "Validation failed",
-          details: validation.error.format(),
+          message:
+            validation.error.issues[0]?.message ||
+            "Validation failed. Please check name, phone, date, and slot.",
         },
         { status: 400 },
       );
@@ -27,18 +61,32 @@ export async function POST(request: NextRequest) {
     const result = await createAppointmentAction(validation.data);
 
     if (!result.success) {
-      return NextResponse.json(result, {
-        status: result.isDuplicate ? 409 : 500,
-      });
+      return NextResponse.json(
+        {
+          success: false,
+          message: result.message || "Failed to book appointment.",
+        },
+        { status: result.isDuplicate ? 409 : 400 },
+      );
     }
 
-    return NextResponse.json(result, { status: 201 });
+    return NextResponse.json(
+      {
+        success: true,
+        bookingId: result.referenceId,
+        referenceId: result.referenceId,
+        message: result.message || "Appointment booked successfully.",
+        date: normalizedData.preferredDate,
+        slot: normalizedData.preferredTimeSlot,
+      },
+      { status: 201 },
+    );
   } catch (error) {
     console.error("[POST /api/appointments error]:", error);
     return NextResponse.json(
       {
         success: false,
-        error: "Internal server error while processing appointment request.",
+        message: "Internal server error while processing appointment request.",
       },
       { status: 500 },
     );
@@ -47,14 +95,12 @@ export async function POST(request: NextRequest) {
 
 /**
  * GET /api/appointments
- * Healthcheck / status check endpoint.
- * In Phase 3, this can be guarded with an admin session or secret API key for n8n/admin polling.
+ * Status check endpoint for n8n and administrators.
  */
 export async function GET(request: NextRequest) {
   const authHeader = request.headers.get("authorization");
   const adminSecret = process.env.ADMIN_API_SECRET;
 
-  // If secret is set, require authorization
   if (adminSecret && authHeader !== `Bearer ${adminSecret}`) {
     return NextResponse.json(
       { success: false, error: "Unauthorized access" },
