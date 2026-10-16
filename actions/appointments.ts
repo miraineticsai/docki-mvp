@@ -120,7 +120,14 @@ export async function createAppointmentAction(
       ...availability.morningSlots,
       ...availability.eveningSlots,
     ];
-    const matchedSlot = allSlots.find((s) => s.slot === preferredTimeSlot);
+
+    const inputSlotClean = preferredTimeSlot.trim().toUpperCase();
+    const matchedSlot = allSlots.find(
+      (s) =>
+        s.slot.toUpperCase() === inputSlotClean ||
+        s.startTime.toUpperCase() === inputSlotClean ||
+        s.slot.toUpperCase().startsWith(inputSlotClean),
+    );
 
     if (allSlots.length > 0) {
       if (!matchedSlot) {
@@ -139,6 +146,8 @@ export async function createAppointmentAction(
       }
     }
 
+    const canonicalSlot = matchedSlot ? matchedSlot.slot : preferredTimeSlot;
+
     // 5. Atomic Database Transaction with Re-check & Insert
     return await db.transaction(async (tx) => {
       // Re-verify that no active appointment exists on this slot
@@ -148,7 +157,7 @@ export async function createAppointmentAction(
         .where(
           and(
             eq(appointments.preferredDate, preferredDate),
-            eq(appointments.preferredTimeSlot, preferredTimeSlot),
+            eq(appointments.preferredTimeSlot, canonicalSlot),
             inArray(appointments.status, ["pending", "confirmed"]),
           ),
         )
@@ -173,7 +182,7 @@ export async function createAppointmentAction(
         patientEmail,
         visitType,
         preferredDate,
-        preferredTimeSlot,
+        preferredTimeSlot: canonicalSlot,
         notes: notes || null,
         status: "pending",
         source: "website",
