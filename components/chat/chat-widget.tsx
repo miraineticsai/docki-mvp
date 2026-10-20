@@ -293,63 +293,53 @@ export function ChatWidget() {
   return (
     <>
       {/* Floating Trigger Button (Bottom Right) */}
-      <div className="fixed bottom-5 right-5 sm:bottom-6 sm:right-6 z-40">
-        <button
-          type="button"
-          onClick={() => setIsOpen((prev) => !prev)}
-          className="relative group flex items-center gap-2.5 px-4 py-3 sm:px-5 sm:py-3.5 rounded-full bg-gradient-to-r from-teal-700 to-teal-800 hover:from-teal-800 hover:to-teal-900 text-white shadow-xl hover:shadow-2xl transition-all duration-300 transform active:scale-95 focus:outline-none focus:ring-4 focus:ring-teal-500/30"
-          aria-label={
-            isOpen
-              ? "Close clinic chat"
-              : "Open clinic assistant & booking chat"
-          }
-        >
-          <div className="relative flex items-center justify-center">
-            {isOpen ? (
-              <HugeiconsIcon
-                icon={Cancel01Icon}
-                className="size-5 transition-transform duration-200"
-                strokeWidth={2.2}
-              />
-            ) : (
+      {!isOpen && (
+        <div className="fixed bottom-5 right-5 sm:bottom-6 sm:right-6 z-40 select-none pointer-events-auto">
+          <button
+            type="button"
+            onClick={() => setIsOpen(true)}
+            className="relative group flex items-center gap-2.5 px-4 py-3 sm:px-5 sm:py-3.5 rounded-full bg-gradient-to-r from-teal-700 to-teal-800 hover:from-teal-800 hover:to-teal-900 text-white shadow-xl hover:shadow-2xl transition-transform active:scale-95 focus:outline-none focus:ring-4 focus:ring-teal-500/30"
+            aria-label="Open clinic assistant & booking chat"
+          >
+            <div className="relative flex items-center justify-center">
               <HugeiconsIcon
                 icon={Message01Icon}
                 className="size-5 transition-transform duration-200 group-hover:scale-110"
                 strokeWidth={2.2}
               />
-            )}
 
-            {/* Unread indicator */}
-            {!isOpen && unreadCount > 0 && (
-              <span className="absolute -top-2 -right-2 flex size-5 items-center justify-center rounded-full bg-rose-500 text-[10px] font-bold text-white shadow">
-                {unreadCount}
+              {/* Unread indicator */}
+              {unreadCount > 0 && (
+                <span className="absolute -top-2 -right-2 flex size-5 items-center justify-center rounded-full bg-rose-500 text-[10px] font-bold text-white shadow">
+                  {unreadCount}
+                </span>
+              )}
+            </div>
+
+            <div className="hidden sm:flex flex-col items-start text-left">
+              <span className="text-xs font-semibold leading-tight flex items-center gap-1.5">
+                <span>Chat & Book</span>
+                <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
+              </span>
+              <span className="text-[10px] text-teal-200 leading-tight">
+                Aura Assistant
+              </span>
+            </div>
+
+            {/* Online green dot for mobile */}
+            {unreadCount === 0 && (
+              <span className="sm:hidden absolute top-0 right-0 flex size-3">
+                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                <span className="relative inline-flex rounded-full size-3 bg-emerald-500 border-2 border-white" />
               </span>
             )}
-          </div>
-
-          <div className="hidden sm:flex flex-col items-start text-left">
-            <span className="text-xs font-semibold leading-tight flex items-center gap-1.5">
-              <span>Chat & Book</span>
-              <span className="size-1.5 rounded-full bg-emerald-400 animate-pulse" />
-            </span>
-            <span className="text-[10px] text-teal-200 leading-tight">
-              Aura Assistant
-            </span>
-          </div>
-
-          {/* Online green dot for mobile */}
-          {!isOpen && unreadCount === 0 && (
-            <span className="sm:hidden absolute top-0 right-0 flex size-3">
-              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
-              <span className="relative inline-flex rounded-full size-3 bg-emerald-500 border-2 border-white" />
-            </span>
-          )}
-        </button>
-      </div>
+          </button>
+        </div>
+      )}
 
       {/* Large Centered Modal Dialog & Backdrop */}
       {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-5 md:p-6 animate-in fade-in duration-200">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-5 md:p-6 w-full max-w-full overflow-hidden animate-in fade-in duration-200">
           {/* Backdrop button */}
           <button
             type="button"
@@ -363,10 +353,10 @@ export function ChatWidget() {
             role="dialog"
             aria-modal="true"
             aria-label="Aura Clinic Assistant & Appointment Booking"
-            className="relative w-full max-w-3xl lg:max-w-4xl h-[100dvh] sm:h-[680px] max-h-[100dvh] sm:max-h-[92vh] flex flex-col rounded-none sm:rounded-3xl border-0 sm:border sm:border-slate-200/90 bg-white shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200"
+            className="relative w-full max-w-full sm:max-w-3xl lg:max-w-4xl h-[100dvh] sm:h-[680px] max-h-[100dvh] sm:max-h-[92vh] flex flex-col rounded-none sm:rounded-3xl border-0 sm:border sm:border-slate-200/90 bg-white shadow-2xl overflow-hidden animate-in zoom-in-95 duration-200"
           >
             {/* Modal Header */}
-            <div className="bg-gradient-to-r from-teal-800 via-teal-900 to-slate-900 px-3.5 py-3 sm:px-5 sm:py-4 text-white flex items-center justify-between border-b border-teal-700/50 shadow-sm shrink-0">
+            <div className="bg-gradient-to-r from-teal-800 via-teal-900 to-slate-900 px-3.5 py-3 sm:px-5 sm:py-4 text-white flex items-center justify-between border-b border-teal-700/50 shadow-sm shrink-0 w-full max-w-full overflow-hidden">
               <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
                 <div className="relative flex size-9 sm:size-11 items-center justify-center rounded-xl sm:rounded-2xl bg-teal-600/80 ring-2 ring-teal-300/30 shadow-inner shrink-0">
                   <HugeiconsIcon
@@ -427,7 +417,7 @@ export function ChatWidget() {
             </div>
 
             {/* Medical Notice / Guardrail Banner */}
-            <div className="flex items-center justify-between gap-2 bg-amber-50/90 border-b border-amber-200/70 px-3.5 py-1.5 sm:px-4 sm:py-2 text-[11px] sm:text-xs text-amber-900 shrink-0">
+            <div className="flex items-center justify-between gap-2 bg-amber-50/90 border-b border-amber-200/70 px-3.5 py-1.5 sm:px-4 sm:py-2 text-[11px] sm:text-xs text-amber-900 shrink-0 w-full max-w-full overflow-hidden">
               <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
                 <HugeiconsIcon
                   icon={InformationCircleIcon}
@@ -455,16 +445,16 @@ export function ChatWidget() {
             </div>
 
             {/* Message Thread (Spacious) */}
-            <div className="flex-1 overflow-y-auto overscroll-contain p-3.5 sm:p-6 space-y-3 sm:space-y-4 bg-slate-50/50 text-sm">
+            <div className="flex-1 overflow-y-auto overflow-x-hidden overscroll-contain w-full max-w-full p-3.5 sm:p-6 space-y-3 sm:space-y-4 bg-slate-50/50 text-sm">
               {messages.map((msg) => (
                 <div
                   key={msg.id}
-                  className={`flex flex-col ${
+                  className={`flex flex-col w-full max-w-full ${
                     msg.role === "user" ? "items-end" : "items-start"
                   }`}
                 >
                   <div
-                    className={`max-w-[88%] sm:max-w-[80%] rounded-2xl px-3.5 py-2.5 sm:px-4 sm:py-3 text-[13.5px] sm:text-sm leading-relaxed whitespace-pre-wrap break-words shadow-xs ${
+                    className={`max-w-[85%] sm:max-w-[80%] rounded-2xl px-3.5 py-2.5 sm:px-4 sm:py-3 text-[13.5px] sm:text-sm leading-relaxed whitespace-pre-wrap break-words [overflow-wrap:anywhere] shadow-xs ${
                       msg.role === "user"
                         ? "bg-teal-700 text-white rounded-tr-xs"
                         : msg.isError
@@ -482,17 +472,17 @@ export function ChatWidget() {
 
               {/* Quick Suggestions (Shown when only initial message exists) */}
               {messages.length === 1 && !isLoading && (
-                <div className="pt-2 sm:pt-3 space-y-1.5 sm:space-y-2 max-w-xl">
+                <div className="pt-2 sm:pt-3 space-y-1.5 sm:space-y-2 w-full max-w-full min-w-0">
                   <p className="text-[11px] sm:text-xs font-semibold text-slate-500 uppercase tracking-wider px-1">
                     Quick Actions
                   </p>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 sm:gap-2">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 sm:gap-2 w-full max-w-full min-w-0">
                     {SUGGESTED_QUESTIONS.map((question) => (
                       <button
                         key={question}
                         type="button"
                         onClick={() => handleSendMessage(question)}
-                        className="text-left text-xs bg-white hover:bg-teal-50/80 active:bg-teal-100 border border-slate-200 hover:border-teal-300 text-slate-700 hover:text-teal-900 rounded-xl px-3 py-2 sm:px-3.5 sm:py-2.5 transition-all shadow-xs flex items-center justify-between group touch-manipulation"
+                        className="text-left text-xs bg-white hover:bg-teal-50/80 active:bg-teal-100 border border-slate-200 hover:border-teal-300 text-slate-700 hover:text-teal-900 rounded-xl px-3 py-2 sm:px-3.5 sm:py-2.5 transition-all shadow-xs flex items-center justify-between group touch-manipulation w-full min-w-0 max-w-full"
                       >
                         <span className="truncate pr-1">{question}</span>
                         <span className="text-teal-500 opacity-60 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity shrink-0">
@@ -506,7 +496,7 @@ export function ChatWidget() {
 
               {/* Typing / Loading Indicator */}
               {isLoading && (
-                <div className="flex flex-col items-start space-y-1">
+                <div className="flex flex-col items-start space-y-1 w-full max-w-full">
                   <div className="flex items-center gap-2 bg-white border border-slate-200 rounded-2xl rounded-tl-xs px-3.5 py-2.5 sm:px-4 sm:py-3 shadow-xs">
                     <span className="text-xs text-slate-500">
                       Dr. Kulkarni&apos;s assistant is thinking
@@ -522,13 +512,13 @@ export function ChatWidget() {
             </div>
 
             {/* Chat Input Footer */}
-            <div className="border-t border-slate-200 bg-white p-2.5 sm:p-4 pb-[max(0.625rem,env(safe-area-inset-bottom))] shrink-0">
+            <div className="border-t border-slate-200 bg-white p-2.5 sm:p-4 pb-[max(0.625rem,env(safe-area-inset-bottom))] shrink-0 w-full max-w-full overflow-hidden">
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
                   handleSendMessage();
                 }}
-                className="flex items-end gap-2 sm:gap-2.5"
+                className="flex items-end gap-2 sm:gap-2.5 w-full max-w-full"
               >
                 <textarea
                   ref={textareaRef}
@@ -539,7 +529,7 @@ export function ChatWidget() {
                   disabled={isLoading}
                   placeholder="Ask about booking, timings, fees..."
                   maxLength={1000}
-                  className="flex-1 min-w-0 resize-none overflow-y-auto max-h-28 sm:max-h-32 min-h-[42px] bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-base sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white disabled:opacity-60 transition leading-relaxed"
+                  className="flex-1 min-w-0 max-w-full resize-none overflow-y-auto max-h-28 sm:max-h-32 min-h-[42px] bg-slate-50 border border-slate-200 rounded-xl px-3.5 py-2.5 text-base sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-teal-600 focus:bg-white disabled:opacity-60 transition leading-relaxed"
                 />
 
                 <Button
