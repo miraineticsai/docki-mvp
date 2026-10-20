@@ -135,7 +135,7 @@ export function AppointmentDetailDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto sm:rounded-2xl">
+      <DialogContent className="w-full max-w-[calc(100vw-1.5rem)] sm:max-w-2xl max-h-[90vh] overflow-x-hidden overflow-y-auto p-4 sm:p-6 sm:rounded-2xl">
         <DialogHeader className="border-b border-slate-100 pb-4">
           <div className="flex flex-wrap items-center justify-between gap-2 pr-6">
             <div>
@@ -230,7 +230,7 @@ export function AppointmentDetailDialog({
               <div className="text-xs font-semibold text-teal-900">
                 Patient's Reason / Symptoms:
               </div>
-              <p className="mt-1 text-xs text-slate-700 whitespace-pre-wrap">
+              <p className="mt-1 text-xs text-slate-700 whitespace-pre-wrap break-words">
                 "{appointment.notes}"
               </p>
             </div>

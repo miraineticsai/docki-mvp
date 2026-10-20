@@ -18,7 +18,6 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { clinicConfig } from "@/config/clinic";
 import type {
   DateAvailabilityResult,
   TimeSlotInfo,
@@ -242,93 +241,64 @@ export function AppointmentForm({
   // SUCCESS CONFIRMATION VIEW
   if (isSubmitted) {
     return (
-      <div className="flex flex-col items-center justify-center p-6 text-center animate-in fade-in zoom-in-95 duration-200">
-        <div className="flex size-14 items-center justify-center rounded-2xl bg-teal-100 text-teal-700 shadow-sm mb-4">
+      <div className="flex flex-col items-center justify-center p-4 text-center animate-in fade-in zoom-in-95 duration-200 w-full max-w-full overflow-hidden">
+        <div className="flex size-12 items-center justify-center rounded-2xl bg-teal-100 text-teal-700 shadow-sm mb-3">
           <HugeiconsIcon
             icon={CheckmarkCircle02Icon}
-            className="size-8"
+            className="size-7"
             strokeWidth={2}
           />
         </div>
 
-        <h3 className="text-xl font-bold tracking-tight text-slate-900">
-          Request Logged Successfully
+        <h3 className="text-lg font-bold tracking-tight text-slate-900">
+          Request Logged
         </h3>
 
-        <div className="mt-2 inline-flex items-center gap-1.5 rounded-full bg-amber-50 border border-amber-200/80 px-3 py-1 text-xs font-semibold text-amber-800">
-          <span className="size-2 rounded-full bg-amber-500 animate-pulse" />
-          Status: Pending Reception Confirmation
-        </div>
-
-        <p className="mt-3 text-xs leading-relaxed text-slate-600 max-w-md">
-          Thank you, <strong className="text-slate-800">{name}</strong>. Your
-          appointment enquiry for{" "}
-          <strong className="text-slate-800">{preferredDate}</strong> at{" "}
-          <strong className="text-slate-800">{preferredTime}</strong> has been
-          safely recorded.
+        <p className="mt-1.5 text-xs text-slate-600 max-w-xs break-words">
+          Thank you, <strong className="text-slate-800">{name}</strong>. Enquiry
+          booked for <strong className="text-slate-800">{preferredDate}</strong>{" "}
+          ({preferredTime}).
         </p>
 
         {/* Copyable Reference ID */}
         {referenceId && (
-          <div className="mt-4 flex flex-col items-center gap-1.5 w-full max-w-sm">
-            <span className="text-[11px] font-semibold text-slate-500 uppercase tracking-wider">
-              Enquiry Reference ID
+          <div className="mt-3 flex flex-col items-center gap-1 w-full max-w-xs">
+            <span className="text-[10px] font-semibold text-slate-400 uppercase tracking-wider">
+              Reference ID
             </span>
-            <div className="flex items-center justify-between w-full rounded-xl border border-teal-200 bg-teal-50/70 px-4 py-2.5">
-              <span className="font-mono text-sm font-bold text-teal-900 tracking-wide">
+            <div className="flex items-center justify-between w-full rounded-xl border border-teal-200 bg-teal-50/70 px-3 py-2">
+              <span className="font-mono text-xs font-bold text-teal-900 tracking-wide truncate">
                 {referenceId}
               </span>
               <button
                 type="button"
                 onClick={handleCopyReference}
-                className="flex items-center gap-1 text-xs font-medium text-teal-700 hover:text-teal-900 transition-colors p-1"
+                className="flex items-center gap-1 text-xs font-medium text-teal-700 hover:text-teal-900 transition-colors p-1 shrink-0 cursor-pointer"
                 title="Copy reference code"
               >
                 <HugeiconsIcon
                   icon={copied ? Tick02Icon : Copy01Icon}
-                  className="size-4"
+                  className="size-3.5"
                 />
-                <span>{copied ? "Copied" : "Copy"}</span>
+                <span className="text-[11px]">
+                  {copied ? "Copied" : "Copy"}
+                </span>
               </button>
             </div>
           </div>
         )}
 
-        {/* Clinic Direct Support Box */}
-        <div className="rounded-xl bg-white p-3.5 text-xs text-slate-600 border border-teal-100 my-4 max-w-sm w-full text-left space-y-1.5 shadow-2xs">
-          <div className="flex items-center justify-between">
-            <span className="font-medium text-slate-700">Clinic Location:</span>
-            <span className="text-slate-900 font-medium">Dhankawadi, Pune</span>
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="font-medium text-slate-700">Reception Phone:</span>
-            <a
-              href={clinicConfig.contact.phoneHref}
-              className="text-teal-700 font-semibold hover:underline"
-            >
-              {clinicConfig.contact.phone}
-            </a>
-          </div>
-          <div className="flex items-center justify-between">
-            <span className="font-medium text-slate-700">WhatsApp Desk:</span>
-            <a
-              href={clinicConfig.contact.whatsappHref}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-emerald-700 font-semibold hover:underline"
-            >
-              Send Message
-            </a>
-          </div>
-        </div>
+        <p className="mt-3 text-[11px] text-slate-500">
+          Our clinic reception will call or WhatsApp you to confirm your token.
+        </p>
 
         <Button
           type="button"
           variant="outline"
           onClick={handleReset}
-          className="mt-1 text-xs font-medium border-teal-200 text-teal-800 hover:bg-teal-50"
+          className="mt-4 text-xs font-medium border-teal-200 text-teal-800 hover:bg-teal-50"
         >
-          Submit Another Request
+          Book Another
         </Button>
       </div>
     );
@@ -336,16 +306,19 @@ export function AppointmentForm({
 
   // ACTIVE BOOKING FORM
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form
+      onSubmit={handleSubmit}
+      className="space-y-4 w-full max-w-full overflow-x-hidden min-w-0"
+    >
       {/* Duplicate Submission Warning Alert */}
       {duplicateWarning && (
-        <div className="rounded-xl border border-amber-300 bg-amber-50 p-3 text-xs text-amber-900 animate-in fade-in-50">
+        <div className="rounded-xl border border-amber-300 bg-amber-50 p-2.5 text-xs text-amber-900 animate-in fade-in-50">
           <strong>Notice:</strong> {duplicateWarning}
         </div>
       )}
 
       {/* Patient Name */}
-      <div className="space-y-1.5">
+      <div className="space-y-1.5 min-w-0">
         <Label
           htmlFor="patient-name"
           className="text-xs font-semibold uppercase tracking-wider text-slate-700"
@@ -371,7 +344,7 @@ export function AppointmentForm({
               }
             }}
             placeholder="e.g. Amit Patil"
-            className={`pl-10 h-11 bg-white text-sm rounded-xl transition-all ${
+            className={`pl-10 h-10 sm:h-11 bg-white text-sm rounded-xl transition-all ${
               fieldErrors.patientName
                 ? "border-red-400 focus:border-red-500 focus:ring-red-200"
                 : "border-slate-200 focus:border-teal-600 focus:ring-teal-500/20"
@@ -387,14 +360,14 @@ export function AppointmentForm({
 
       {/* Contact Grid: Phone & Email */}
       <div
-        className={`grid gap-4 ${isCompact ? "grid-cols-1" : "grid-cols-1 sm:grid-cols-2"}`}
+        className={`grid gap-3 ${isCompact ? "grid-cols-1" : "grid-cols-1 sm:grid-cols-2"} min-w-0`}
       >
-        <div className="space-y-1.5">
+        <div className="space-y-1.5 min-w-0">
           <Label
             htmlFor="patient-phone"
             className="text-xs font-semibold uppercase tracking-wider text-slate-700"
           >
-            Mobile (Call/WhatsApp) <span className="text-teal-600">*</span>
+            Phone Number <span className="text-teal-600">*</span>
           </Label>
           <div className="relative">
             <HugeiconsIcon
@@ -415,7 +388,7 @@ export function AppointmentForm({
                 }
               }}
               placeholder="e.g. 98220 12345"
-              className={`pl-10 h-11 bg-white text-sm rounded-xl transition-all ${
+              className={`pl-10 h-10 sm:h-11 bg-white text-sm rounded-xl transition-all ${
                 fieldErrors.patientPhone
                   ? "border-red-400 focus:border-red-500 focus:ring-red-200"
                   : "border-slate-200 focus:border-teal-600 focus:ring-teal-500/20"
@@ -429,7 +402,7 @@ export function AppointmentForm({
           )}
         </div>
 
-        <div className="space-y-1.5">
+        <div className="space-y-1.5 min-w-0">
           <Label
             htmlFor="patient-email"
             className="text-xs font-semibold uppercase tracking-wider text-slate-700"
@@ -454,8 +427,8 @@ export function AppointmentForm({
                   setFieldErrors((prev) => ({ ...prev, patientEmail: "" }));
                 }
               }}
-              placeholder="e.g. amit.patil@example.com"
-              className={`pl-10 h-11 bg-white text-sm rounded-xl transition-all ${
+              placeholder="e.g. name@example.com"
+              className={`pl-10 h-10 sm:h-11 bg-white text-sm rounded-xl transition-all ${
                 fieldErrors.patientEmail
                   ? "border-red-400 focus:border-red-500 focus:ring-red-200"
                   : "border-slate-200 focus:border-teal-600 focus:ring-teal-500/20"
@@ -471,7 +444,7 @@ export function AppointmentForm({
       </div>
 
       {/* Visit Type */}
-      <div className="space-y-1.5">
+      <div className="space-y-1.5 min-w-0">
         <Label
           htmlFor="visit-type"
           className="text-xs font-semibold uppercase tracking-wider text-slate-700"
@@ -483,7 +456,7 @@ export function AppointmentForm({
           disabled={isSubmitting}
           value={visitType}
           onChange={(e) => setVisitType(e.target.value)}
-          className="w-full h-11 px-3.5 rounded-xl border border-slate-200 bg-white text-sm text-slate-800 focus:outline-none focus:border-teal-600 focus:ring-2 focus:ring-teal-500/20 disabled:opacity-50"
+          className="w-full h-10 sm:h-11 px-3.5 rounded-xl border border-slate-200 bg-white text-sm text-slate-800 focus:outline-none focus:border-teal-600 focus:ring-2 focus:ring-teal-500/20 disabled:opacity-50 truncate"
         >
           {VISIT_TYPES.map((type) => (
             <option key={type} value={type}>
@@ -494,16 +467,16 @@ export function AppointmentForm({
       </div>
 
       {/* Date Selection */}
-      <div className="space-y-1.5">
+      <div className="space-y-1.5 min-w-0">
         <div className="flex items-center justify-between">
           <Label
             htmlFor="preferred-date"
             className="text-xs font-semibold uppercase tracking-wider text-slate-700"
           >
-            Select Appointment Date <span className="text-teal-600">*</span>
+            Appointment Date <span className="text-teal-600">*</span>
           </Label>
           {availability && (
-            <span className="text-[11px] text-slate-500 font-medium">
+            <span className="text-[11px] text-slate-500 font-medium truncate">
               {availability.formattedDate}
             </span>
           )}
@@ -527,7 +500,7 @@ export function AppointmentForm({
                 setFieldErrors((prev) => ({ ...prev, preferredDate: "" }));
               }
             }}
-            className={`pl-10 h-11 bg-white text-sm rounded-xl transition-all ${
+            className={`pl-10 h-10 sm:h-11 bg-white text-sm rounded-xl transition-all ${
               fieldErrors.preferredDate
                 ? "border-red-400 focus:border-red-500 focus:ring-red-200"
                 : "border-slate-200 focus:border-teal-600 focus:ring-teal-500/20"
@@ -542,79 +515,73 @@ export function AppointmentForm({
       </div>
 
       {/* Dynamic Available Time Slots Picker */}
-      <div className="space-y-2 pt-1">
+      <div className="space-y-2 pt-1 min-w-0">
         <div className="flex items-center justify-between">
           <Label className="text-xs font-semibold uppercase tracking-wider text-slate-700">
-            Available Time Slots <span className="text-teal-600">*</span>
+            Available Slots <span className="text-teal-600">*</span>
           </Label>
           {availability?.isWorkingDay && !availability.isUnavailableDate && (
             <span
               className={cn(
-                "rounded-full px-2 py-0.5 text-[10px] font-bold",
+                "rounded-full px-2 py-0.5 text-[10px] font-bold shrink-0",
                 availability.availableCount > 0
                   ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                   : "bg-rose-50 text-rose-700 border border-rose-200",
               )}
             >
-              {availability.availableCount} of {availability.totalSlots} Slots
-              Available
+              {availability.availableCount} Available
             </span>
           )}
         </div>
 
         {isLoadingSlots ? (
           /* Skeletons while loading */
-          <div className="rounded-xl border border-slate-200 bg-slate-50/60 p-4 space-y-3">
-            <div className="h-3 w-28 bg-slate-200 rounded animate-pulse" />
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-              {[
-                "sk-slot-1",
-                "sk-slot-2",
-                "sk-slot-3",
-                "sk-slot-4",
-                "sk-slot-5",
-                "sk-slot-6",
-              ].map((skKey) => (
-                <div
-                  key={skKey}
-                  className="h-9 bg-slate-200 rounded-lg animate-pulse"
-                />
-              ))}
+          <div className="rounded-xl border border-slate-200 bg-slate-50/60 p-3 space-y-2">
+            <div className="h-3 w-24 bg-slate-200 rounded animate-pulse" />
+            <div className="grid grid-cols-2 gap-2">
+              {["sk-slot-1", "sk-slot-2", "sk-slot-3", "sk-slot-4"].map(
+                (skKey) => (
+                  <div
+                    key={skKey}
+                    className="h-9 bg-slate-200 rounded-lg animate-pulse"
+                  />
+                ),
+              )}
             </div>
           </div>
         ) : availability &&
           (!availability.isWorkingDay || availability.isUnavailableDate) ? (
           /* Closed / Unavailable Day Alert */
-          <div className="rounded-xl border border-rose-200 bg-rose-50/80 p-4 text-center">
+          <div className="rounded-xl border border-rose-200 bg-rose-50/80 p-3 text-center">
             <p className="text-xs font-semibold text-rose-800">
               {availability.reason || "Doctor unavailable on this date."}
             </p>
-            <p className="text-[11px] text-rose-600 mt-1">
-              Please choose an alternate future date from Monday to Sunday.
+            <p className="text-[11px] text-rose-600 mt-0.5">
+              Please choose another future date.
             </p>
           </div>
         ) : availability && availability.availableCount === 0 ? (
           /* Fully Booked Alert */
-          <div className="rounded-xl border border-amber-200 bg-amber-50/80 p-4 text-center">
+          <div className="rounded-xl border border-amber-200 bg-amber-50/80 p-3 text-center">
             <p className="text-xs font-semibold text-amber-800">
-              All appointments for this date are fully booked!
+              All appointments for this date are fully booked.
             </p>
-            <p className="text-[11px] text-amber-600 mt-1">
-              Please select another date, or contact clinic reception for
-              emergency walk-ins.
+            <p className="text-[11px] text-amber-600 mt-0.5">
+              Please choose another date or contact reception for emergency
+              walk-ins.
             </p>
           </div>
         ) : (
           /* Available Slots Chips grouped by Morning & Evening */
-          <div className="rounded-xl border border-slate-200 bg-slate-50/50 p-3 space-y-3">
+          <div className="rounded-xl border border-slate-200 bg-slate-50/50 p-2.5 sm:p-3 space-y-2.5 min-w-0">
             {/* Morning Shift */}
             {availability && availability.morningSlots.length > 0 && (
-              <div className="space-y-1.5">
-                <div className="text-[11px] font-bold tracking-wider text-slate-500 uppercase flex items-center gap-1.5">
+              <div className="space-y-1.5 min-w-0">
+                <div className="text-[10px] font-bold tracking-wider text-slate-500 uppercase flex items-center gap-1.5">
                   <span className="size-1.5 rounded-full bg-amber-500" />
                   Morning Clinic
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 min-w-0">
                   {availability.morningSlots.map((s: TimeSlotInfo) => {
                     const isSelected = preferredTime === s.slot;
                     return (
@@ -632,7 +599,7 @@ export function AppointmentForm({
                           }
                         }}
                         className={cn(
-                          "flex items-center justify-between rounded-lg px-3 py-2 text-xs font-medium transition-all text-left border",
+                          "flex items-center justify-between rounded-lg px-2.5 py-2 text-xs font-medium transition-all text-left border min-w-0 cursor-pointer",
                           !s.isAvailable
                             ? "bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed opacity-60"
                             : isSelected
@@ -640,18 +607,18 @@ export function AppointmentForm({
                               : "bg-white text-slate-800 border-slate-200 hover:border-teal-400 hover:bg-teal-50/40",
                         )}
                       >
-                        <span className="truncate">{s.slot}</span>
+                        <span className="truncate min-w-0">{s.slot}</span>
                         {!s.isAvailable ? (
-                          <span className="text-[10px] uppercase font-bold text-slate-400">
+                          <span className="text-[10px] uppercase font-bold text-slate-400 shrink-0 ml-1">
                             Booked
                           </span>
                         ) : isSelected ? (
                           <HugeiconsIcon
                             icon={Tick02Icon}
-                            className="size-3.5 text-white"
+                            className="size-3.5 text-white shrink-0 ml-1"
                           />
                         ) : (
-                          <span className="size-2 rounded-full bg-emerald-500" />
+                          <span className="size-2 rounded-full bg-emerald-500 shrink-0 ml-1" />
                         )}
                       </button>
                     );
@@ -662,12 +629,12 @@ export function AppointmentForm({
 
             {/* Evening Shift */}
             {availability && availability.eveningSlots.length > 0 && (
-              <div className="space-y-1.5 pt-2 border-t border-slate-200/60">
-                <div className="text-[11px] font-bold tracking-wider text-slate-500 uppercase flex items-center gap-1.5">
+              <div className="space-y-1.5 pt-2 border-t border-slate-200/60 min-w-0">
+                <div className="text-[10px] font-bold tracking-wider text-slate-500 uppercase flex items-center gap-1.5">
                   <span className="size-1.5 rounded-full bg-teal-600" />
                   Evening Clinic
                 </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 min-w-0">
                   {availability.eveningSlots.map((s: TimeSlotInfo) => {
                     const isSelected = preferredTime === s.slot;
                     return (
@@ -685,7 +652,7 @@ export function AppointmentForm({
                           }
                         }}
                         className={cn(
-                          "flex items-center justify-between rounded-lg px-3 py-2 text-xs font-medium transition-all text-left border",
+                          "flex items-center justify-between rounded-lg px-2.5 py-2 text-xs font-medium transition-all text-left border min-w-0 cursor-pointer",
                           !s.isAvailable
                             ? "bg-slate-100 text-slate-400 border-slate-200 cursor-not-allowed opacity-60"
                             : isSelected
@@ -693,18 +660,18 @@ export function AppointmentForm({
                               : "bg-white text-slate-800 border-slate-200 hover:border-teal-400 hover:bg-teal-50/40",
                         )}
                       >
-                        <span className="truncate">{s.slot}</span>
+                        <span className="truncate min-w-0">{s.slot}</span>
                         {!s.isAvailable ? (
-                          <span className="text-[10px] uppercase font-bold text-slate-400">
+                          <span className="text-[10px] uppercase font-bold text-slate-400 shrink-0 ml-1">
                             Booked
                           </span>
                         ) : isSelected ? (
                           <HugeiconsIcon
                             icon={Tick02Icon}
-                            className="size-3.5 text-white"
+                            className="size-3.5 text-white shrink-0 ml-1"
                           />
                         ) : (
-                          <span className="size-2 rounded-full bg-emerald-500" />
+                          <span className="size-2 rounded-full bg-emerald-500 shrink-0 ml-1" />
                         )}
                       </button>
                     );
@@ -723,52 +690,31 @@ export function AppointmentForm({
       </div>
 
       {/* Optional Patient Symptoms / Notes */}
-      <div className="space-y-1.5">
+      <div className="space-y-1.5 min-w-0">
         <Label
           htmlFor="patient-notes"
           className="text-xs font-semibold uppercase tracking-wider text-slate-700"
         >
-          Symptoms / Notes for Dr. Kulkarni{" "}
+          Symptoms or Notes{" "}
           <span className="text-[11px] font-normal text-slate-400">
             (Optional)
           </span>
         </Label>
         <Textarea
           id="patient-notes"
-          rows={3}
+          rows={2}
           disabled={isSubmitting}
           value={notes}
           onChange={(e) => setNotes(e.target.value)}
-          placeholder="e.g. Having mild fever since 2 days, previous prescription review..."
+          placeholder="e.g. Fever, routine follow-up (optional)"
           className="bg-white text-sm rounded-xl border-slate-200 focus:border-teal-600 focus:ring-teal-500/20"
         />
       </div>
 
-      {/* Non-Confirmation Disclaimer */}
-      <div className="rounded-xl border border-teal-100 bg-teal-50/70 p-3 text-xs text-teal-900 leading-relaxed">
-        <p className="font-semibold text-teal-950">
-          Important Notice Regarding Confirmation:
-        </p>
-        <p className="mt-0.5 text-[11px] text-teal-800/90">
-          Slots are held with <strong>pending</strong> status until our clinic
-          reception verifies patient details via call or WhatsApp message.
-        </p>
-      </div>
-
-      {/* Emergency Guidance */}
-      <div className="rounded-xl border border-red-100 bg-red-50/80 p-3 text-xs text-red-900 leading-relaxed">
-        <p className="font-semibold text-red-950">Emergency Guidance:</p>
-        <p className="mt-0.5 text-[11px] text-red-800">
-          This portal is for scheduled OPD visits only. For acute chest pain,
-          breathlessness, or trauma, call{" "}
-          <strong className="text-red-950">108 / 112</strong> or proceed
-          immediately to{" "}
-          <strong className="text-red-950">
-            Bharati Hospital 24/7 Casualty
-          </strong>
-          , Dhankawadi, Pune.
-        </p>
-      </div>
+      {/* Concise Notice */}
+      <p className="text-[11px] text-slate-500 text-center leading-normal">
+        Reception will confirm via call/WhatsApp. For emergencies, dial 108.
+      </p>
 
       {/* Submit Button */}
       <Button
@@ -781,15 +727,15 @@ export function AppointmentForm({
               availability.isUnavailableDate ||
               availability.availableCount === 0))
         }
-        className="w-full bg-teal-700 hover:bg-teal-800 text-white font-medium text-sm h-12 rounded-xl shadow-sm transition-all disabled:opacity-50"
+        className="w-full bg-teal-700 hover:bg-teal-800 text-white font-medium text-sm h-11 rounded-xl shadow-sm transition-all disabled:opacity-50 cursor-pointer"
       >
         {isSubmitting ? (
           <div className="flex items-center gap-2">
             <div className="size-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
-            <span>Reserving Time Slot...</span>
+            <span>Booking...</span>
           </div>
         ) : (
-          `Request Appointment for ${preferredTime || "Selected Slot"}`
+          "Confirm Appointment"
         )}
       </Button>
     </form>
