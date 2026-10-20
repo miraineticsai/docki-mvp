@@ -53,20 +53,14 @@ export function AppointmentDialog({
         {triggerButtonText}
       </DialogTrigger>
 
-      <DialogContent className="sm:max-w-xl max-h-[90vh] overflow-y-auto p-6 sm:p-8 bg-white border border-teal-100 rounded-3xl shadow-xl">
-        <DialogHeader className="mb-4">
-          <div className="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-teal-700">
-            <span className="size-2 rounded-full bg-teal-600 animate-pulse" />
-            Direct Clinical Scheduling
-          </div>
-          <DialogTitle className="text-xl sm:text-2xl font-semibold text-slate-900 tracking-tight">
-            Schedule a Consultation with {clinicConfig.doctor.name}, MBBS
+      <DialogContent className="w-full max-w-[calc(100vw-1.5rem)] sm:max-w-lg max-h-[90vh] overflow-x-hidden overflow-y-auto p-4 sm:p-6 bg-white border border-teal-100 rounded-2xl sm:rounded-3xl shadow-xl">
+        <DialogHeader className="mb-3 text-left">
+          <DialogTitle className="text-lg sm:text-xl font-bold text-slate-900 tracking-tight">
+            Schedule Consultation
           </DialogTitle>
-          <DialogDescription className="text-xs sm:text-sm text-slate-600">
-            Senior Doctor at Bharati Vidyapeeth Hospital & Family Physician at
-            Aura Clinic, Dhankawadi, Pune. Note: Submitting registers a request
-            only; our reception will contact you to confirm doctor availability
-            and issue your OPD token.
+          <DialogDescription className="text-xs text-slate-600">
+            Select your preferred date and time slot with{" "}
+            {clinicConfig.doctor.name}.
           </DialogDescription>
         </DialogHeader>
 
