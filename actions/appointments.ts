@@ -4,6 +4,7 @@ import { and, eq, gte, inArray } from "drizzle-orm";
 import { getAvailableSlotsForDateAction } from "@/actions/schedule";
 import { db } from "@/db";
 import { appointments } from "@/db/schema";
+import { sendConsultationConfirmationEmail } from "@/lib/email/service";
 import {
   type AppointmentActionResponse,
   type AppointmentSubmissionInput,
@@ -149,7 +150,7 @@ export async function createAppointmentAction(
     const canonicalSlot = matchedSlot ? matchedSlot.slot : preferredTimeSlot;
 
     // 5. Atomic Database Transaction with Re-check & Insert
-    return await db.transaction(async (tx) => {
+    const txResult = await db.transaction(async (tx) => {
       // Re-verify that no active appointment exists on this slot
       const slotOccupied = await tx
         .select({ id: appointments.id })
@@ -200,6 +201,31 @@ export async function createAppointmentAction(
           "Your appointment request has been logged successfully with pending status.",
       };
     });
+
+    // 6. Send Consultation Confirmation Email strictly AFTER database commit
+    if (txResult.success && txResult.referenceId) {
+      try {
+        await sendConsultationConfirmationEmail({
+          appointment: {
+            referenceId: txResult.referenceId,
+            patientName,
+            patientPhone: cleanedPhone,
+            patientEmail,
+            preferredDate,
+            preferredTimeSlot: canonicalSlot,
+            visitType,
+            notes: notes || null,
+          },
+        });
+      } catch (emailError) {
+        console.error(
+          "[actions/appointments] Non-blocking email dispatch error:",
+          emailError,
+        );
+      }
+    }
+
+    return txResult;
   } catch (error: unknown) {
     console.error("[Appointment Submission Error]:", error);
 

@@ -9,6 +9,7 @@ import {
 import { HugeiconsIcon } from "@hugeicons/react";
 import { useState } from "react";
 import { AppointmentDialog } from "@/components/appointment-dialog";
+import { CancellationDialog } from "@/components/cancellation-dialog";
 import { ClinicLogo } from "@/components/clinic-logo";
 import { Button } from "@/components/ui/button";
 import { clinicConfig } from "@/config/clinic";
@@ -33,9 +34,9 @@ export function Navbar() {
                 12:00–5:00 PM
               </span>
             </div>
-            <span className="inline-flex items-center gap-1.5 rounded-full bg-teal-100/80 px-2.5 py-0.5 font-medium text-teal-800">
+            <span className="hidden xl:inline-flex items-center gap-1.5 rounded-full bg-teal-100/80 px-2.5 py-0.5 font-medium text-teal-800">
               <span className="size-1.5 rounded-full bg-emerald-500 animate-pulse" />
-              Senior Doctor @ Bharati Vidyapeeth Hospital & Personal Clinic
+              Senior Doctor @ Bharati Hospital & Aura Clinic
             </span>
           </div>
 
@@ -63,14 +64,14 @@ export function Navbar() {
 
           {/* Desktop Navigation Links */}
           <nav
-            className="hidden items-center gap-8 md:flex"
+            className="hidden items-center gap-4 lg:gap-6 xl:gap-7 md:flex"
             aria-label="Main Navigation"
           >
             {clinicConfig.navigation.map((item) => (
               <a
                 key={item.href}
                 href={item.href}
-                className="text-sm font-medium text-slate-700 transition-colors hover:text-teal-700"
+                className="text-xs lg:text-sm font-medium text-slate-700 transition-colors hover:text-teal-700"
               >
                 {item.label}
               </a>
@@ -78,10 +79,10 @@ export function Navbar() {
           </nav>
 
           {/* Desktop Right CTA */}
-          <div className="hidden items-center gap-3 md:flex">
+          <div className="hidden items-center gap-2 lg:gap-2.5 xl:gap-3 md:flex">
             <a
               href={clinicConfig.contact.phoneHref}
-              className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3.5 py-2 text-xs font-semibold text-slate-700 transition-colors hover:border-teal-300 hover:bg-teal-50/50 hover:text-teal-800"
+              className="hidden xl:inline-flex items-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold text-slate-700 transition-colors hover:border-teal-300 hover:bg-teal-50/50 hover:text-teal-800"
             >
               <HugeiconsIcon
                 icon={Call02Icon}
@@ -91,10 +92,16 @@ export function Navbar() {
               <span>Call Clinic</span>
             </a>
 
+            <CancellationDialog
+              triggerText="Cancel Booking"
+              triggerVariant="outline"
+              className="h-9 px-2.5 lg:px-3 text-xs font-medium rounded-xl border-slate-200 text-slate-700 hover:text-rose-700 hover:border-rose-200"
+            />
+
             <AppointmentDialog
               triggerButtonText="Book Appointment"
               triggerVariant="default"
-              className="h-10 px-4 text-xs font-semibold uppercase tracking-wider rounded-xl shadow-xs"
+              className="h-9 px-3 lg:px-4 text-xs font-semibold rounded-xl shadow-xs"
             />
           </div>
 
@@ -163,11 +170,17 @@ export function Navbar() {
                 </span>
               </div>
 
-              <div className="pt-2">
+              <div className="pt-2 flex flex-col gap-2">
                 <AppointmentDialog
                   triggerButtonText="Schedule an Appointment"
                   triggerVariant="default"
                   className="w-full h-12 text-sm font-semibold rounded-xl"
+                />
+
+                <CancellationDialog
+                  triggerText="Cancel Pending Appointment"
+                  triggerVariant="outline"
+                  className="w-full h-11 text-xs font-medium rounded-xl border-slate-200 text-slate-700 hover:text-rose-700"
                 />
               </div>
             </div>

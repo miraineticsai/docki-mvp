@@ -14,6 +14,7 @@ import { useCallback, useEffect, useState } from "react";
 import { toast } from "sonner";
 import { createAppointmentAction } from "@/actions/appointments";
 import { getAvailableSlotsForDateAction } from "@/actions/schedule";
+import { CancellationDialog } from "@/components/cancellation-dialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -292,14 +293,23 @@ export function AppointmentForm({
           Our clinic reception will call or WhatsApp you to confirm your token.
         </p>
 
-        <Button
-          type="button"
-          variant="outline"
-          onClick={handleReset}
-          className="mt-4 text-xs font-medium border-teal-200 text-teal-800 hover:bg-teal-50"
-        >
-          Book Another
-        </Button>
+        <div className="flex flex-col items-center gap-1.5 mt-4">
+          <Button
+            type="button"
+            variant="outline"
+            onClick={handleReset}
+            className="text-xs font-medium border-teal-200 text-teal-800 hover:bg-teal-50"
+          >
+            Book Another
+          </Button>
+
+          <CancellationDialog
+            triggerText="Cancel this request"
+            triggerVariant="link"
+            defaultReferenceId={referenceId || ""}
+            className="text-[11px] text-rose-600 hover:text-rose-800 p-0 h-auto font-normal cursor-pointer"
+          />
+        </div>
       </div>
     );
   }
@@ -738,6 +748,14 @@ export function AppointmentForm({
           "Confirm Appointment"
         )}
       </Button>
+
+      <div className="pt-1 text-center">
+        <CancellationDialog
+          triggerText="Already booked? Cancel pending request"
+          triggerVariant="link"
+          className="text-[11px] text-slate-500 hover:text-rose-600 p-0 h-auto font-normal cursor-pointer"
+        />
+      </div>
     </form>
   );
 }

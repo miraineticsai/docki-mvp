@@ -1,3 +1,5 @@
+"use client";
+
 import {
   Call02Icon,
   Clock01Icon,
@@ -6,6 +8,7 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import Link from "next/link";
+import { CancellationDialog } from "@/components/cancellation-dialog";
 import { clinicConfig } from "@/config/clinic";
 
 export function Footer() {
@@ -99,6 +102,18 @@ export function Footer() {
                 >
                   WhatsApp Appointment
                 </a>
+              </li>
+              <li>
+                <CancellationDialog
+                  trigger={
+                    <button
+                      type="button"
+                      className="text-amber-400 hover:text-amber-300 transition-colors font-medium text-left"
+                    >
+                      Cancel Appointment
+                    </button>
+                  }
+                />
               </li>
             </ul>
           </div>
@@ -212,6 +227,16 @@ export function Footer() {
             >
               Accessibility
             </Link>
+            <CancellationDialog
+              trigger={
+                <button
+                  type="button"
+                  className="text-amber-400/90 hover:text-amber-300 transition-colors cursor-pointer"
+                >
+                  Cancel Appointment
+                </button>
+              }
+            />
             <Link
               href="/admin"
               className="text-slate-300 hover:text-teal-300 transition-colors flex items-center gap-1 font-medium"

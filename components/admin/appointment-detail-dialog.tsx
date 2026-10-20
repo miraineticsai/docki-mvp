@@ -100,7 +100,23 @@ export function AppointmentDetailDialog({
   const handleQuickReject = () => handleSave("cancelled");
   const handleQuickComplete = () => handleSave("completed");
 
+  const isCancelledByUser = Boolean(
+    (appointment?.metadata as Record<string, unknown>)?.cancelledByUser,
+  );
+  const userCancellationReason = (
+    appointment?.metadata as Record<string, unknown>
+  )?.userCancellationReason as string | undefined;
+
   const statusBadge = (s: string) => {
+    if (isCancelledByUser) {
+      return (
+        <span className="inline-flex items-center gap-1.5 rounded-full bg-rose-50 border border-rose-300 px-2.5 py-0.5 text-xs font-semibold text-rose-800">
+          <span className="size-1.5 rounded-full bg-rose-600" />
+          Cancelled by Patient (Locked)
+        </span>
+      );
+    }
+
     switch (s) {
       case "pending":
         return (
@@ -242,9 +258,34 @@ export function AppointmentDetailDialog({
 
           {/* Clinical Triage & Status Update Form */}
           <div className="space-y-4 rounded-xl border border-slate-200 p-4">
-            <div className="text-xs font-bold uppercase tracking-wider text-slate-700">
-              Doctor Triage & Token Assignment
+            <div className="flex items-center justify-between">
+              <div className="text-xs font-bold uppercase tracking-wider text-slate-700">
+                Doctor Triage & Token Assignment
+              </div>
+              {isCancelledByUser && (
+                <span className="text-[11px] font-semibold text-rose-700 bg-rose-50 px-2 py-0.5 rounded border border-rose-200">
+                  Patient Self-Cancelled • Read Only
+                </span>
+              )}
             </div>
+
+            {isCancelledByUser && (
+              <div className="rounded-lg bg-rose-50 border border-rose-200 p-3 text-xs text-rose-800 space-y-1.5">
+                <div>
+                  <strong>Notice:</strong> This appointment was cancelled by the
+                  patient via verified self-service and cannot be restored or
+                  modified.
+                </div>
+                {userCancellationReason && (
+                  <div className="pt-1.5 border-t border-rose-200/80 text-[11px] text-rose-900">
+                    <span className="font-semibold text-rose-950">
+                      Patient's Reason:
+                    </span>{" "}
+                    "{userCancellationReason}"
+                  </div>
+                )}
+              </div>
+            )}
 
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               {/* Status Selector */}
@@ -257,11 +298,12 @@ export function AppointmentDetailDialog({
                 </Label>
                 <select
                   id="status-select"
+                  disabled={isSubmitting || isCancelledByUser}
                   value={status}
                   onChange={(e) =>
                     setStatus(e.target.value as Appointment["status"])
                   }
-                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-medium text-slate-900 shadow-xs focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500"
+                  className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-xs font-medium text-slate-900 shadow-xs focus:border-teal-500 focus:outline-none focus:ring-1 focus:ring-teal-500 disabled:opacity-50 disabled:bg-slate-100"
                 >
                   <option value="pending">Pending Review</option>
                   <option value="confirmed">Confirmed</option>
@@ -280,10 +322,11 @@ export function AppointmentDetailDialog({
                 </Label>
                 <Input
                   id="token-number"
+                  disabled={isSubmitting || isCancelledByUser}
                   placeholder="e.g. T-08, Token 12"
                   value={tokenNumber}
                   onChange={(e) => setTokenNumber(e.target.value)}
-                  className="h-9 text-xs"
+                  className="h-9 text-xs disabled:opacity-50 disabled:bg-slate-100"
                 />
               </div>
             </div>
@@ -298,11 +341,12 @@ export function AppointmentDetailDialog({
               </Label>
               <Textarea
                 id="doctor-notes"
+                disabled={isSubmitting || isCancelledByUser}
                 placeholder="Add clinical remarks, patient history notes, or callback instructions..."
                 rows={3}
                 value={doctorNotes}
                 onChange={(e) => setDoctorNotes(e.target.value)}
-                className="text-xs"
+                className="text-xs disabled:opacity-50 disabled:bg-slate-100"
               />
             </div>
           </div>
@@ -315,8 +359,8 @@ export function AppointmentDetailDialog({
                 size="sm"
                 variant="outline"
                 onClick={handleQuickConfirm}
-                disabled={isSubmitting}
-                className="border-emerald-300 bg-emerald-50 text-emerald-800 hover:bg-emerald-100 text-xs h-8"
+                disabled={isSubmitting || isCancelledByUser}
+                className="border-emerald-300 bg-emerald-50 text-emerald-800 hover:bg-emerald-100 text-xs h-8 disabled:opacity-40"
               >
                 <HugeiconsIcon
                   icon={CheckmarkCircle01Icon}
@@ -330,8 +374,8 @@ export function AppointmentDetailDialog({
                 size="sm"
                 variant="outline"
                 onClick={handleQuickReject}
-                disabled={isSubmitting}
-                className="border-rose-300 bg-rose-50 text-rose-800 hover:bg-rose-100 text-xs h-8"
+                disabled={isSubmitting || isCancelledByUser}
+                className="border-rose-300 bg-rose-50 text-rose-800 hover:bg-rose-100 text-xs h-8 disabled:opacity-40"
               >
                 <HugeiconsIcon icon={Cancel01Icon} className="size-3.5 mr-1" />
                 Reject Request
@@ -342,8 +386,8 @@ export function AppointmentDetailDialog({
                 size="sm"
                 variant="outline"
                 onClick={handleQuickComplete}
-                disabled={isSubmitting}
-                className="border-blue-300 bg-blue-50 text-blue-800 hover:bg-blue-100 text-xs h-8"
+                disabled={isSubmitting || isCancelledByUser}
+                className="border-blue-300 bg-blue-50 text-blue-800 hover:bg-blue-100 text-xs h-8 disabled:opacity-40"
               >
                 Mark Completed
               </Button>
@@ -353,8 +397,8 @@ export function AppointmentDetailDialog({
               type="button"
               size="sm"
               onClick={() => handleSave()}
-              disabled={isSubmitting}
-              className="bg-teal-700 hover:bg-teal-800 text-white text-xs h-8 ml-auto"
+              disabled={isSubmitting || isCancelledByUser}
+              className="bg-teal-700 hover:bg-teal-800 text-white text-xs h-8 ml-auto disabled:opacity-40"
             >
               {isSubmitting ? "Saving..." : "Save All Details"}
             </Button>
