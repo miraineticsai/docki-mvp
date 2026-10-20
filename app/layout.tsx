@@ -17,6 +17,8 @@ export const viewport: Viewport = {
   themeColor: "#0f766e",
   width: "device-width",
   initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export const metadata: Metadata = {
@@ -75,14 +77,14 @@ export default function RootLayout({
     <html
       lang="en"
       className={cn(
-        "h-full antialiased font-sans scroll-smooth",
+        "h-full w-full max-w-full overflow-x-hidden antialiased font-sans scroll-smooth",
         figtree.variable,
       )}
     >
       <head>
         <JsonLd />
       </head>
-      <body className="min-h-full flex flex-col bg-white text-slate-900 selection:bg-teal-100 selection:text-teal-900">
+      <body className="min-h-full w-full max-w-full overflow-x-hidden flex flex-col bg-white text-slate-900 selection:bg-teal-100 selection:text-teal-900">
         {children}
         <ChatWidget />
         <Toaster position="bottom-right" richColors />
