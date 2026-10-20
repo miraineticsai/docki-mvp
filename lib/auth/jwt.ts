@@ -14,6 +14,16 @@ export interface AdminSessionPayload {
 }
 
 function base64UrlEncode(buffer: ArrayBuffer | Uint8Array | string): string {
+  if (typeof Buffer !== "undefined") {
+    if (typeof buffer === "string") {
+      return Buffer.from(buffer, "utf-8").toString("base64url");
+    }
+    if (buffer instanceof Uint8Array) {
+      return Buffer.from(buffer).toString("base64url");
+    }
+    return Buffer.from(buffer).toString("base64url");
+  }
+
   let bytes: Uint8Array;
   if (typeof buffer === "string") {
     bytes = new TextEncoder().encode(buffer);
@@ -33,6 +43,11 @@ function base64UrlEncode(buffer: ArrayBuffer | Uint8Array | string): string {
 }
 
 function base64UrlDecode(str: string): Uint8Array {
+  if (typeof Buffer !== "undefined") {
+    const buf = Buffer.from(str, "base64url");
+    return new Uint8Array(buf.buffer, buf.byteOffset, buf.byteLength);
+  }
+
   let base64 = str.replace(/-/g, "+").replace(/_/g, "/");
   while (base64.length % 4) {
     base64 += "=";
@@ -52,15 +67,24 @@ function getSessionSecret(): string {
   );
 }
 
+// In-memory key cache to avoid re-importing the CryptoKey on every operation
+let cachedHmacKey: CryptoKey | null = null;
+let cachedHmacSecret: string | null = null;
+
 async function getHmacKey(secret: string): Promise<CryptoKey> {
+  if (cachedHmacKey && cachedHmacSecret === secret) {
+    return cachedHmacKey;
+  }
   const enc = new TextEncoder();
-  return crypto.subtle.importKey(
+  cachedHmacKey = await crypto.subtle.importKey(
     "raw",
     enc.encode(secret),
     { name: "HMAC", hash: "SHA-256" },
     false,
     ["sign", "verify"],
   );
+  cachedHmacSecret = secret;
+  return cachedHmacKey;
 }
 
 /**
@@ -134,9 +158,12 @@ export async function verifyAdminToken(
   }
 }
 
-/**
- * Timing-safe credential comparison to prevent timing attacks.
- */
+// Cache target hashes to avoid recomputing on every login attempt
+let cachedTargetEmail: string | null = null;
+let cachedTargetEmailHash: Uint8Array | null = null;
+let cachedTargetPassword: string | null = null;
+let cachedTargetPasswordHash: Uint8Array | null = null;
+
 export async function verifyAdminCredentials(
   emailInput: string,
   passwordInput: string,
@@ -147,29 +174,39 @@ export async function verifyAdminCredentials(
   const targetPassword = process.env.ADMIN_PASSWORD || "AuraDoc@2026!";
 
   const normalizedInputEmail = emailInput.toLowerCase().trim();
-
   const enc = new TextEncoder();
-  const [hashPassInput, hashPassTarget, hashEmailInput, hashEmailTarget] =
-    await Promise.all([
-      crypto.subtle.digest("SHA-256", enc.encode(passwordInput)),
-      crypto.subtle.digest("SHA-256", enc.encode(targetPassword)),
-      crypto.subtle.digest("SHA-256", enc.encode(normalizedInputEmail)),
-      crypto.subtle.digest("SHA-256", enc.encode(targetEmail)),
-    ]);
+
+  if (!cachedTargetEmailHash || cachedTargetEmail !== targetEmail) {
+    const hash = await crypto.subtle.digest("SHA-256", enc.encode(targetEmail));
+    cachedTargetEmailHash = new Uint8Array(hash);
+    cachedTargetEmail = targetEmail;
+  }
+
+  if (!cachedTargetPasswordHash || cachedTargetPassword !== targetPassword) {
+    const hash = await crypto.subtle.digest(
+      "SHA-256",
+      enc.encode(targetPassword),
+    );
+    cachedTargetPasswordHash = new Uint8Array(hash);
+    cachedTargetPassword = targetPassword;
+  }
+
+  const [hashPassInput, hashEmailInput] = await Promise.all([
+    crypto.subtle.digest("SHA-256", enc.encode(passwordInput)),
+    crypto.subtle.digest("SHA-256", enc.encode(normalizedInputEmail)),
+  ]);
 
   const arrPassInput = new Uint8Array(hashPassInput);
-  const arrPassTarget = new Uint8Array(hashPassTarget);
   const arrEmailInput = new Uint8Array(hashEmailInput);
-  const arrEmailTarget = new Uint8Array(hashEmailTarget);
 
   let passDiff = 0;
   for (let i = 0; i < 32; i++) {
-    passDiff |= arrPassInput[i] ^ arrPassTarget[i];
+    passDiff |= arrPassInput[i] ^ cachedTargetPasswordHash[i];
   }
 
   let emailDiff = 0;
   for (let i = 0; i < 32; i++) {
-    emailDiff |= arrEmailInput[i] ^ arrEmailTarget[i];
+    emailDiff |= arrEmailInput[i] ^ cachedTargetEmailHash[i];
   }
 
   return passDiff === 0 && emailDiff === 0;

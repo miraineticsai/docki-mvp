@@ -8,10 +8,9 @@ import {
 } from "@hugeicons/core-free-icons";
 import { HugeiconsIcon } from "@hugeicons/react";
 import Link from "next/link";
-import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useState, useTransition } from "react";
+import { useSearchParams } from "next/navigation";
+import { Suspense, useState } from "react";
 import { toast } from "sonner";
-import { loginAdminAction } from "@/actions/admin";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -25,7 +24,6 @@ import { Label } from "@/components/ui/label";
 import { clinicConfig } from "@/config/clinic";
 
 function AdminLoginForm() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const redirectUrl = searchParams.get("redirect") || "/admin";
 
@@ -33,7 +31,7 @@ function AdminLoginForm() {
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [isPending, startTransition] = useTransition();
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleFillDemo = () => {
     setEmail("doctor@auraclinic.com");
@@ -41,26 +39,34 @@ function AdminLoginForm() {
     setErrorMessage(null);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setErrorMessage(null);
+    setIsLoading(true);
 
-    startTransition(async () => {
-      try {
-        const res = await loginAdminAction({ email, password });
-        if (res.success) {
-          toast.success("Welcome back! Redirecting to dashboard...");
-          router.push(redirectUrl);
-          router.refresh();
-        } else {
-          setErrorMessage(res.message);
-          toast.error(res.message);
-        }
-      } catch {
-        setErrorMessage("An unexpected error occurred. Please try again.");
-        toast.error("Sign in failed. Check your network connection.");
+    try {
+      const res = await fetch("/api/admin/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        credentials: "include",
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await res.json();
+
+      if (res.ok && data.success) {
+        toast.success("Welcome back! Redirecting to dashboard...");
+        window.location.href = redirectUrl;
+      } else {
+        setErrorMessage(data.message || "Invalid email or password.");
+        toast.error(data.message || "Sign in failed.");
+        setIsLoading(false);
       }
-    });
+    } catch {
+      setErrorMessage("An unexpected error occurred. Please try again.");
+      toast.error("Sign in failed. Check your network connection.");
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -152,10 +158,10 @@ function AdminLoginForm() {
           {/* Submit Button */}
           <Button
             type="submit"
-            disabled={isPending}
+            disabled={isLoading}
             className="w-full bg-teal-700 hover:bg-teal-800 text-white font-medium text-xs h-10 mt-2 shadow-sm"
           >
-            {isPending ? (
+            {isLoading ? (
               <div className="flex items-center gap-2">
                 <div className="size-3.5 animate-spin rounded-full border-2 border-white border-t-transparent" />
                 <span>Verifying credentials...</span>

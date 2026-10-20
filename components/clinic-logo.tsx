@@ -35,11 +35,11 @@ export function ClinicLogo({
       </div>
 
       <div className="flex flex-col">
-        <span className="font-heading text-lg font-semibold tracking-tight text-slate-900 sm:text-xl">
+        <span className="font-heading text-base font-semibold tracking-tight text-slate-900 sm:text-lg">
           {clinicConfig.name}
         </span>
         {showTagline && (
-          <span className="text-xs font-medium text-teal-700">
+          <span className="hidden text-[11px] font-medium text-teal-700 lg:block">
             {clinicConfig.doctor.name},{" "}
             {clinicConfig.doctor.credentials.split(",")[0]}
           </span>

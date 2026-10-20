@@ -153,7 +153,19 @@ export function AppointmentsManager({
     }
   }
 
-  const renderStatusBadge = (s: string) => {
+  const renderStatusBadge = (s: string, metadata?: unknown) => {
+    const isCancelledByUser = Boolean(
+      (metadata as Record<string, unknown>)?.cancelledByUser,
+    );
+    if (isCancelledByUser) {
+      return (
+        <span className="inline-flex items-center gap-1 rounded-full bg-rose-50 px-2 py-0.5 text-[11px] font-semibold text-rose-800 border border-rose-300">
+          <span className="size-1.5 rounded-full bg-rose-600" />
+          Cancelled (Patient)
+        </span>
+      );
+    }
+
     switch (s) {
       case "pending":
         return (
@@ -474,7 +486,9 @@ export function AppointmentsManager({
                     </TableCell>
 
                     {/* Status Badge */}
-                    <TableCell>{renderStatusBadge(apt.status)}</TableCell>
+                    <TableCell>
+                      {renderStatusBadge(apt.status, apt.metadata)}
+                    </TableCell>
 
                     {/* Token */}
                     <TableCell>

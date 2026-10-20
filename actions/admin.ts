@@ -1,6 +1,6 @@
 "use server";
 
-import { and, count, desc, eq, gte, ilike, inArray, lt, or } from "drizzle-orm";
+import { and, desc, eq, gte, ilike, inArray, lt, or, sql } from "drizzle-orm";
 import { db } from "@/db";
 import { appointments } from "@/db/schema";
 import { verifyAdminCredentials } from "@/lib/auth/jwt";
@@ -9,6 +9,7 @@ import {
   requireAdminSession,
   setAdminSessionCookie,
 } from "@/lib/auth/session";
+import { sendAdminActionEmail } from "@/lib/email/service";
 import {
   adminLoginSchema,
   updateAppointmentStatusSchema,
@@ -85,37 +86,18 @@ export async function getDashboardStatsAction() {
 
     const todayStr = getTodayDateString();
 
-    // Query aggregate counts in parallel
-    const [
-      totalRes,
-      pendingRes,
-      confirmedRes,
-      completedRes,
-      cancelledRes,
-      todayRes,
-      recentPending,
-    ] = await Promise.all([
-      db.select({ count: count() }).from(appointments),
-      db
-        .select({ count: count() })
-        .from(appointments)
-        .where(eq(appointments.status, "pending")),
-      db
-        .select({ count: count() })
-        .from(appointments)
-        .where(eq(appointments.status, "confirmed")),
-      db
-        .select({ count: count() })
-        .from(appointments)
-        .where(eq(appointments.status, "completed")),
-      db
-        .select({ count: count() })
-        .from(appointments)
-        .where(inArray(appointments.status, ["cancelled", "rejected"])),
-      db
-        .select({ count: count() })
-        .from(appointments)
-        .where(eq(appointments.preferredDate, todayStr)),
+    // Query aggregate counts in 1 single fast query, and fetch recent pending in parallel
+    const [countsResult, recentPending] = await Promise.all([
+      db.execute(sql`
+        SELECT
+          COUNT(*)::int AS total,
+          COUNT(*) FILTER (WHERE status = 'pending')::int AS pending,
+          COUNT(*) FILTER (WHERE status = 'confirmed')::int AS confirmed,
+          COUNT(*) FILTER (WHERE status = 'completed')::int AS completed,
+          COUNT(*) FILTER (WHERE status IN ('cancelled', 'rejected'))::int AS cancelled,
+          COUNT(*) FILTER (WHERE preferred_date = ${todayStr})::int AS today
+        FROM appointments
+      `),
       db
         .select()
         .from(appointments)
@@ -124,20 +106,30 @@ export async function getDashboardStatsAction() {
         .limit(6),
     ]);
 
+    const row = ((countsResult as unknown as Record<string, unknown>[])[0] ||
+      {}) as Record<string, number>;
+
     return {
       success: true,
       data: {
-        total: totalRes[0]?.count ?? 0,
-        pending: pendingRes[0]?.count ?? 0,
-        confirmed: confirmedRes[0]?.count ?? 0,
-        completed: completedRes[0]?.count ?? 0,
-        cancelled: cancelledRes[0]?.count ?? 0,
-        today: todayRes[0]?.count ?? 0,
+        total: Number(row.total || 0),
+        pending: Number(row.pending || 0),
+        confirmed: Number(row.confirmed || 0),
+        completed: Number(row.completed || 0),
+        cancelled: Number(row.cancelled || 0),
+        today: Number(row.today || 0),
         todayDate: todayStr,
         recentPending,
       },
     };
   } catch (error) {
+    if (error instanceof Error && error.message.includes("Unauthorized")) {
+      return {
+        success: false,
+        message: error.message,
+        data: null,
+      };
+    }
     console.error("[getDashboardStatsAction Error]:", error);
     return {
       success: false,
@@ -220,6 +212,13 @@ export async function getAppointmentsListAction(params?: {
       data: results,
     };
   } catch (error) {
+    if (error instanceof Error && error.message.includes("Unauthorized")) {
+      return {
+        success: false,
+        message: error.message,
+        data: [],
+      };
+    }
     console.error("[getAppointmentsListAction Error]:", error);
     return {
       success: false,
@@ -269,6 +268,18 @@ export async function updateAppointmentStatusAction(input: {
         ? existing.metadata
         : {};
 
+    // Enforce business rule: Once cancelled by user, it cannot be overridden by admin
+    if (
+      existing.status === "cancelled" &&
+      (existingMetadata as Record<string, unknown>)?.cancelledByUser === true
+    ) {
+      return {
+        success: false,
+        message:
+          "This appointment was cancelled by the patient and cannot be modified or restored.",
+      };
+    }
+
     const updated = await db
       .update(appointments)
       .set({
@@ -287,12 +298,38 @@ export async function updateAppointmentStatusAction(input: {
       .where(eq(appointments.referenceId, referenceId))
       .returning();
 
+    const updatedAppointment = updated[0];
+
+    // Trigger Admin Action Notification Email strictly AFTER DB update succeeds
+    if (updatedAppointment) {
+      try {
+        await sendAdminActionEmail({
+          appointment: updatedAppointment,
+          previousStatus: existing.status,
+          previousTokenNumber: existing.tokenNumber,
+          previousDoctorNotes: existing.doctorNotes,
+          adminEmail,
+        });
+      } catch (emailErr) {
+        console.error(
+          `[actions/admin] Non-blocking admin action email dispatch error for ${referenceId}:`,
+          emailErr,
+        );
+      }
+    }
+
     return {
       success: true,
       message: `Appointment ${referenceId} updated to ${status}.`,
-      appointment: updated[0],
+      appointment: updatedAppointment,
     };
   } catch (error) {
+    if (error instanceof Error && error.message.includes("Unauthorized")) {
+      return {
+        success: false,
+        message: error.message,
+      };
+    }
     console.error("[updateAppointmentStatusAction Error]:", error);
     return {
       success: false,

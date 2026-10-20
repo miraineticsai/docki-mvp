@@ -2,6 +2,7 @@ import { sql } from "drizzle-orm";
 import {
   date,
   index,
+  integer,
   jsonb,
   pgTable,
   text,
@@ -74,3 +75,37 @@ export type Appointment = typeof appointments.$inferSelect;
 export type NewAppointment = typeof appointments.$inferInsert;
 export type ClinicSetting = typeof clinicSettings.$inferSelect;
 export type NewClinicSetting = typeof clinicSettings.$inferInsert;
+
+/**
+ * Cancellation Requests Table
+ * Secure storage for OTP hashes, session verification tokens, and rate-limiting metrics.
+ */
+export const cancellationRequests = pgTable(
+  "cancellation_requests",
+  {
+    id: uuid("id").defaultRandom().primaryKey(),
+    referenceId: varchar("reference_id", { length: 30 }).notNull(),
+    otpHash: text("otp_hash").notNull(),
+    sessionToken: varchar("session_token", { length: 64 }).unique(),
+    attempts: integer("attempts").default(0).notNull(),
+    maxAttempts: integer("max_attempts").default(5).notNull(),
+    resendCooldownUntil: timestamp("resend_cooldown_until", {
+      withTimezone: true,
+    }).notNull(),
+    expiresAt: timestamp("expires_at", { withTimezone: true }).notNull(),
+    verifiedAt: timestamp("verified_at", { withTimezone: true }),
+    usedAt: timestamp("used_at", { withTimezone: true }),
+    ipAddress: varchar("ip_address", { length: 45 }),
+    createdAt: timestamp("created_at", { withTimezone: true })
+      .defaultNow()
+      .notNull(),
+  },
+  (table) => [
+    index("cancellation_requests_reference_idx").on(table.referenceId),
+    index("cancellation_requests_session_idx").on(table.sessionToken),
+    index("cancellation_requests_created_idx").on(table.createdAt),
+  ],
+);
+
+export type CancellationRequest = typeof cancellationRequests.$inferSelect;
+export type NewCancellationRequest = typeof cancellationRequests.$inferInsert;

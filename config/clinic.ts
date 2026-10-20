@@ -360,10 +360,10 @@ export const clinicConfig: ClinicConfig = {
   },
 
   navigation: [
-    { label: "About Doctor", href: "#doctor" },
+    { label: "About", href: "#doctor" },
     { label: "Services", href: "#services" },
-    { label: "Why Choose Us", href: "#why-us" },
-    { label: "Timings & Contact", href: "#contact" },
+    { label: "Why Us", href: "#why-us" },
+    { label: "Contact", href: "#contact" },
   ],
 
   seo: {
